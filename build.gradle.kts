@@ -33,6 +33,7 @@ intellijPlatform {
     pluginConfiguration {
         ideaVersion {
             sinceBuild = "243"
+            untilBuild = "999.*"
         }
     }
 }
@@ -41,5 +42,6 @@ tasks {
     patchPluginXml {
         version = project.version.toString()
         sinceBuild = "243"
+        untilBuild = "999.*"
     }
 }
