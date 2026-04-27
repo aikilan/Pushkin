@@ -1,5 +1,6 @@
 package com.commitai.settings
 
+import com.commitai.i18n.CommitAiBundle
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.ui.Messages
 import com.intellij.ui.components.JBLabel
@@ -23,7 +24,7 @@ class CommitAiConfigurable : Configurable {
 
     private var panel: JPanel? = null
 
-    override fun getDisplayName(): String = "Commit AI"
+    override fun getDisplayName(): String = CommitAiBundle.message("settings.display.name")
 
     override fun createComponent(): JComponent {
         if (panel != null) return panel as JPanel
@@ -38,7 +39,7 @@ class CommitAiConfigurable : Configurable {
         c.gridx = 0
         c.gridy = 0
         c.weightx = 0.0
-        result.add(JBLabel("Base URL"), c)
+        result.add(JBLabel(CommitAiBundle.message("settings.label.baseUrl")), c)
 
         c.gridx = 1
         c.weightx = 1.0
@@ -47,7 +48,7 @@ class CommitAiConfigurable : Configurable {
         c.gridx = 0
         c.gridy++
         c.weightx = 0.0
-        result.add(JBLabel("API Key"), c)
+        result.add(JBLabel(CommitAiBundle.message("settings.label.apiKey")), c)
 
         c.gridx = 1
         c.weightx = 1.0
@@ -56,7 +57,7 @@ class CommitAiConfigurable : Configurable {
         c.gridx = 0
         c.gridy++
         c.weightx = 0.0
-        result.add(JBLabel("Model"), c)
+        result.add(JBLabel(CommitAiBundle.message("settings.label.model")), c)
 
         c.gridx = 1
         c.weightx = 1.0
@@ -65,7 +66,7 @@ class CommitAiConfigurable : Configurable {
         c.gridx = 0
         c.gridy++
         c.weightx = 0.0
-        result.add(JBLabel("Temperature (0~1)"), c)
+        result.add(JBLabel(CommitAiBundle.message("settings.label.temperature")), c)
 
         c.gridx = 1
         c.weightx = 1.0
@@ -75,7 +76,7 @@ class CommitAiConfigurable : Configurable {
         c.gridy++
         c.anchor = GridBagConstraints.NORTHWEST
         c.weightx = 0.0
-        result.add(JBLabel("Prompt Template"), c)
+        result.add(JBLabel(CommitAiBundle.message("settings.label.promptTemplate")), c)
 
         c.gridx = 1
         c.weightx = 1.0
@@ -101,7 +102,10 @@ class CommitAiConfigurable : Configurable {
         val state = settings.state
         val temp = temperatureField.text.toDoubleOrNull()
         if (temp == null || temp !in 0.0..1.0) {
-            Messages.showErrorDialog("Temperature 必须是 0 到 1 之间的数字", "Commit AI")
+            Messages.showErrorDialog(
+                CommitAiBundle.message("settings.error.temperatureRange"),
+                CommitAiBundle.message("dialog.title"),
+            )
             return
         }
 

@@ -2,6 +2,7 @@
     <id>com.commitai.plugin</id>
     <name>Commit AI (OpenAI Compatible)</name>
     <vendor email="support@example.com">Commit AI</vendor>
+    <resource-bundle>messages.CommitAiBundle</resource-bundle>
 
     <description>
         <![CDATA[
@@ -17,15 +18,15 @@
         <applicationService serviceImplementation="com.commitai.settings.CommitAiSettings"/>
         <applicationConfigurable
                 id="com.commitai.settings"
-                displayName="Commit AI"
+                displayName="%settings.display.name"
                 instance="com.commitai.settings.CommitAiConfigurable"/>
     </extensions>
 
     <actions>
         <action id="CommitAi.GenerateCommitMessageAction"
                 class="com.commitai.vcs.GenerateCommitMessageAction"
-                text="使用 Commit AI 生成提交消息"
-                description="根据已选变更自动生成提交消息">
+                text="%action.generate.text"
+                description="%action.generate.description">
             <add-to-group group-id="Vcs.MessageActionGroup" anchor="last"/>
         </action>
     </actions>

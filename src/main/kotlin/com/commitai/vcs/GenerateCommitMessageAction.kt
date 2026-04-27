@@ -1,6 +1,7 @@
 package com.commitai.vcs
 
 import com.commitai.ai.OpenAiCompatibleClient
+import com.commitai.i18n.CommitAiBundle
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.progress.ProgressManager
@@ -32,36 +33,50 @@ class GenerateCommitMessageAction : AnAction() {
 
         val selectedChanges = panel.selectedChanges
         if (selectedChanges.isEmpty()) {
-            Messages.showInfoMessage(project, "请先选择至少一个变更文件", "Commit AI")
+            Messages.showInfoMessage(
+                project,
+                CommitAiBundle.message("action.info.selectChange"),
+                CommitAiBundle.message("dialog.title"),
+            )
             return
         }
 
         val contextText = buildContext(selectedChanges)
-        ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Commit AI 生成提交消息", false) {
-            override fun run(indicator: com.intellij.openapi.progress.ProgressIndicator) {
-                indicator.text = "正在调用 AI 服务..."
-                runCatching {
-                    client.generateCommitMessage(contextText)
-                }.onSuccess { message ->
-                    UIUtil.invokeLaterIfNeeded {
-                        if (message.isBlank()) {
-                            Messages.showWarningDialog(project, "AI 未返回可用提交消息", "Commit AI")
-                            return@invokeLaterIfNeeded
+        ProgressManager.getInstance().run(
+            object : Task.Backgroundable(project, CommitAiBundle.message("action.task.generating"), false) {
+                override fun run(indicator: com.intellij.openapi.progress.ProgressIndicator) {
+                    indicator.text = CommitAiBundle.message("action.progress.callingAi")
+                    runCatching {
+                        client.generateCommitMessage(contextText)
+                    }.onSuccess { message ->
+                        UIUtil.invokeLaterIfNeeded {
+                            if (message.isBlank()) {
+                                Messages.showWarningDialog(
+                                    project,
+                                    CommitAiBundle.message("action.warning.emptyResult"),
+                                    CommitAiBundle.message("dialog.title"),
+                                )
+                                return@invokeLaterIfNeeded
+                            }
+                            panel.commitMessage = message
                         }
-                        panel.commitMessage = message
-                    }
-                }.onFailure { error ->
-                    UIUtil.invokeLaterIfNeeded {
-                        Messages.showErrorDialog(project, error.message ?: "未知错误", "Commit AI")
+                    }.onFailure { error ->
+                        UIUtil.invokeLaterIfNeeded {
+                            Messages.showErrorDialog(
+                                project,
+                                error.message ?: CommitAiBundle.message("action.error.unknown"),
+                                CommitAiBundle.message("dialog.title"),
+                            )
+                        }
                     }
                 }
-            }
-        })
+            },
+        )
     }
 
     private fun buildContext(changes: Collection<Change>): String {
         val builder = StringBuilder()
-        builder.appendLine("以下是本次提交涉及的变更，请基于信息生成 1 条提交消息：")
+        builder.appendLine(CommitAiBundle.message("action.context.header"))
         changes.forEachIndexed { index, change ->
             builder.appendLine("${index + 1}. ${describeChange(change)}")
             val diffSnippet = buildDiffSnippet(change)
@@ -76,11 +91,11 @@ class GenerateCommitMessageAction : AnAction() {
         val before = change.beforeRevision?.file?.path
         val after = change.afterRevision?.file?.path
         return when {
-            before == null && after != null -> "新增文件: $after"
-            before != null && after == null -> "删除文件: $before"
-            before != null && after != null && before != after -> "重命名文件: $before -> $after"
-            after != null -> "修改文件: $after"
-            else -> "未知变更"
+            before == null && after != null -> CommitAiBundle.message("action.change.added", after)
+            before != null && after == null -> CommitAiBundle.message("action.change.deleted", before)
+            before != null && after != null && before != after -> CommitAiBundle.message("action.change.renamed", before, after)
+            after != null -> CommitAiBundle.message("action.change.modified", after)
+            else -> CommitAiBundle.message("action.change.unknown")
         }
     }
 
@@ -106,7 +121,7 @@ class GenerateCommitMessageAction : AnAction() {
         return if (rawSnippet.length <= MAX_DIFF_CHARS_PER_FILE) {
             rawSnippet
         } else {
-            rawSnippet.take(MAX_DIFF_CHARS_PER_FILE) + "\n...（该文件 diff 已截断）"
+            rawSnippet.take(MAX_DIFF_CHARS_PER_FILE) + CommitAiBundle.message("action.diff.truncated")
         }
     }
 
@@ -116,7 +131,7 @@ class GenerateCommitMessageAction : AnAction() {
         val builder = StringBuilder("--- /dev/null\n+++ new file\n")
         snippetLines.forEach { builder.appendLine("+ $it") }
         if (lines.size > snippetLines.size) {
-            builder.appendLine("+ ...（新增内容省略 ${lines.size - snippetLines.size} 行）")
+            builder.appendLine(CommitAiBundle.message("action.diff.addedOmitted", lines.size - snippetLines.size))
         }
         return builder.toString().trimEnd()
     }
@@ -127,7 +142,7 @@ class GenerateCommitMessageAction : AnAction() {
         val builder = StringBuilder("--- deleted file\n+++ /dev/null\n")
         snippetLines.forEach { builder.appendLine("- $it") }
         if (lines.size > snippetLines.size) {
-            builder.appendLine("- ...（删除内容省略 ${lines.size - snippetLines.size} 行）")
+            builder.appendLine(CommitAiBundle.message("action.diff.deletedOmitted", lines.size - snippetLines.size))
         }
         return builder.toString().trimEnd()
     }
@@ -165,11 +180,15 @@ class GenerateCommitMessageAction : AnAction() {
         builder.appendLine("+++ after")
         beforeSnippet.forEach { builder.appendLine("- $it") }
         if (beforeChanged.size > beforeSnippet.size) {
-            builder.appendLine("- ...（修改前内容省略 ${beforeChanged.size - beforeSnippet.size} 行）")
+            builder.appendLine(
+                CommitAiBundle.message("action.diff.modifiedBeforeOmitted", beforeChanged.size - beforeSnippet.size),
+            )
         }
         afterSnippet.forEach { builder.appendLine("+ $it") }
         if (afterChanged.size > afterSnippet.size) {
-            builder.appendLine("+ ...（修改后内容省略 ${afterChanged.size - afterSnippet.size} 行）")
+            builder.appendLine(
+                CommitAiBundle.message("action.diff.modifiedAfterOmitted", afterChanged.size - afterSnippet.size),
+            )
         }
         return builder.toString().trimEnd()
     }
@@ -190,6 +209,6 @@ class GenerateCommitMessageAction : AnAction() {
         if (context.length <= MAX_CONTEXT_CHARS) {
             return context
         }
-        return context.take(MAX_CONTEXT_CHARS) + "\n\n[提示] 其余上下文已截断。"
+        return context.take(MAX_CONTEXT_CHARS) + CommitAiBundle.message("action.context.truncated")
     }
 }

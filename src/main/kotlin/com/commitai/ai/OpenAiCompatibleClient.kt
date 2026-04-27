@@ -1,5 +1,6 @@
 package com.commitai.ai
 
+import com.commitai.i18n.CommitAiBundle
 import com.commitai.settings.CommitAiSettings
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -43,24 +44,24 @@ class OpenAiCompatibleClient(
 
         val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
         if (response.statusCode() !in 200..299) {
-            error("请求失败(${response.statusCode()}): ${response.body()}")
+            error(CommitAiBundle.message("client.error.requestFailed", response.statusCode(), response.body()))
         }
 
         val parsed = json.decodeFromString(ChatResponse.serializer(), response.body())
         val content = parsed.choices.firstOrNull()?.message?.content?.trim().orEmpty()
         if (content.isBlank()) {
-            error("AI 返回内容为空，请检查模型或提示词配置")
+            error(CommitAiBundle.message("client.error.emptyResponse"))
         }
         return content
     }
 
     private fun validateState(state: CommitAiSettings.State) {
-        require(state.baseUrl.isNotBlank()) { "请先在设置中配置 Base URL" }
+        require(state.baseUrl.isNotBlank()) { CommitAiBundle.message("client.validate.baseUrl.blank") }
         require(state.baseUrl.startsWith("http://") || state.baseUrl.startsWith("https://")) {
-            "Base URL 必须以 http:// 或 https:// 开头"
+            CommitAiBundle.message("client.validate.baseUrl.invalid")
         }
-        require(state.apiKey.isNotBlank()) { "请先在设置中配置 API Key" }
-        require(state.model.isNotBlank()) { "请先在设置中配置 Model" }
+        require(state.apiKey.isNotBlank()) { CommitAiBundle.message("client.validate.apiKey.blank") }
+        require(state.model.isNotBlank()) { CommitAiBundle.message("client.validate.model.blank") }
     }
 
     @Serializable
