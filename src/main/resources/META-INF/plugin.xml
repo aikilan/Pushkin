@@ -1,0 +1,32 @@
+<idea-plugin>
+    <id>com.commitai.plugin</id>
+    <name>Commit AI (OpenAI Compatible)</name>
+    <vendor email="support@example.com">Commit AI</vendor>
+
+    <description>
+        <![CDATA[
+        在提交窗口中提供 AI 生成提交消息能力，可配置 OpenAI 协议上游服务。
+        ]]>
+    </description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.vcs</depends>
+    <depends>Git4Idea</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="com.commitai.settings.CommitAiSettings"/>
+        <applicationConfigurable
+                id="com.commitai.settings"
+                displayName="Commit AI"
+                instance="com.commitai.settings.CommitAiConfigurable"/>
+    </extensions>
+
+    <actions>
+        <action id="CommitAi.GenerateCommitMessageAction"
+                class="com.commitai.vcs.GenerateCommitMessageAction"
+                text="使用 Commit AI 生成提交消息"
+                description="根据已选变更自动生成提交消息">
+            <add-to-group group-id="Vcs.MessageActionGroup" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
