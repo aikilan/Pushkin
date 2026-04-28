@@ -30,6 +30,9 @@ kotlin {
 }
 
 intellijPlatform {
+    // 关闭 headless 设置索引生成，避免打包时输出 JetBrains 平台内部 configurable warning。
+    buildSearchableOptions.set(false)
+
     pluginConfiguration {
         ideaVersion {
             sinceBuild = "243"

@@ -21,7 +21,8 @@ class OpenAiCompatibleClient(
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    fun generateCommitMessage(userContext: String): String {
+    // systemPrompt 由调用方按“项目提示词优先，否则全局提示词”规则解析后传入。
+    fun generateCommitMessage(userContext: String, systemPrompt: String): String {
         val state = settings.state
         validateState(state)
 
@@ -29,7 +30,7 @@ class OpenAiCompatibleClient(
             model = state.model,
             temperature = state.temperature,
             messages = listOf(
-                ChatMessage("system", state.promptTemplate),
+                ChatMessage("system", systemPrompt),
                 ChatMessage("user", userContext),
             ),
         )

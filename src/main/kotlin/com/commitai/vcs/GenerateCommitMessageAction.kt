@@ -2,6 +2,8 @@ package com.commitai.vcs
 
 import com.commitai.ai.OpenAiCompatibleClient
 import com.commitai.i18n.CommitAiBundle
+import com.commitai.settings.CommitAiProjectSettings
+import com.commitai.settings.CommitAiSettings
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.Presentation
@@ -51,6 +53,7 @@ class GenerateCommitMessageAction : AnAction() {
         }
 
         val contextText = buildContext(selectedChanges)
+        val systemPrompt = resolveSystemPrompt(project)
         loadingProjects.add(project)
         updatePresentation(e.presentation, isVisible = true, isLoading = true)
         ProgressManager.getInstance().run(
@@ -58,7 +61,7 @@ class GenerateCommitMessageAction : AnAction() {
                 override fun run(indicator: com.intellij.openapi.progress.ProgressIndicator) {
                     indicator.text = CommitAiBundle.message("action.progress.callingAi")
                     runCatching {
-                        client.generateCommitMessage(contextText)
+                        client.generateCommitMessage(contextText, systemPrompt)
                     }.onSuccess { message ->
                         UIUtil.invokeLaterIfNeeded {
                             loadingProjects.remove(project)
@@ -94,6 +97,12 @@ class GenerateCommitMessageAction : AnAction() {
                 }
             },
         )
+    }
+
+    // 项目提示词非空时覆盖全局提示词，留空则保持现有全局提示词体验。
+    private fun resolveSystemPrompt(project: Project): String {
+        val projectPrompt = CommitAiProjectSettings.getInstance(project).state.promptTemplate.trim()
+        return projectPrompt.ifBlank { CommitAiSettings.getInstance().state.promptTemplate }
     }
 
     // 统一刷新提交按钮展示状态，避免 XML 占位符 tooltip 和点击 loading 状态不同步。

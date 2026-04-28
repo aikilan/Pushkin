@@ -16,7 +16,8 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="com.commitai.settings.CommitAiSettings"/>
-        <applicationConfigurable
+        <projectService serviceImplementation="com.commitai.settings.CommitAiProjectSettings"/>
+        <projectConfigurable
                 id="com.commitai.settings"
                 key="settings.display.name"
                 instance="com.commitai.settings.CommitAiConfigurable"/>
