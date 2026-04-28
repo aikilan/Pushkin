@@ -18,15 +18,15 @@
         <applicationService serviceImplementation="com.commitai.settings.CommitAiSettings"/>
         <applicationConfigurable
                 id="com.commitai.settings"
-                displayName="%settings.display.name"
+                key="settings.display.name"
                 instance="com.commitai.settings.CommitAiConfigurable"/>
     </extensions>
 
     <actions>
         <action id="CommitAi.GenerateCommitMessageAction"
                 class="com.commitai.vcs.GenerateCommitMessageAction"
-                text="%action.generate.text"
-                description="%action.generate.description"
+                text="Commit AI"
+                description="Generate commit message based on selected changes"
                 icon="/icons/icon.svg">
             <add-to-group group-id="Vcs.MessageActionGroup" anchor="last"/>
         </action>
