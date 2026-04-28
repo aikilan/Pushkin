@@ -1,1 +1,1 @@
-rootProject.name = "commit-ai"
+rootProject.name = "pushkin"

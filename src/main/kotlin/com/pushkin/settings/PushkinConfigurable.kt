@@ -1,6 +1,6 @@
-package com.commitai.settings
+package com.pushkin.settings
 
-import com.commitai.i18n.CommitAiBundle
+import com.pushkin.i18n.PushkinBundle
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
@@ -14,9 +14,9 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 
-class CommitAiConfigurable(project: Project) : Configurable {
-    private val globalSettings = CommitAiSettings.getInstance()
-    private val projectSettings = CommitAiProjectSettings.getInstance(project)
+class PushkinConfigurable(project: Project) : Configurable {
+    private val globalSettings = PushkinSettings.getInstance()
+    private val projectSettings = PushkinProjectSettings.getInstance(project)
 
     private val baseUrlField = JBTextField()
     private val apiKeyField = JBPasswordField()
@@ -27,7 +27,7 @@ class CommitAiConfigurable(project: Project) : Configurable {
 
     private var panel: JPanel? = null
 
-    override fun getDisplayName(): String = CommitAiBundle.message("settings.display.name")
+    override fun getDisplayName(): String = PushkinBundle.message("settings.display.name")
 
     override fun createComponent(): JComponent {
         if (panel != null) return panel as JPanel
@@ -42,7 +42,7 @@ class CommitAiConfigurable(project: Project) : Configurable {
         c.gridx = 0
         c.gridy = 0
         c.weightx = 0.0
-        result.add(JBLabel(CommitAiBundle.message("settings.label.baseUrl")), c)
+        result.add(JBLabel(PushkinBundle.message("settings.label.baseUrl")), c)
 
         c.gridx = 1
         c.weightx = 1.0
@@ -51,7 +51,7 @@ class CommitAiConfigurable(project: Project) : Configurable {
         c.gridx = 0
         c.gridy++
         c.weightx = 0.0
-        result.add(JBLabel(CommitAiBundle.message("settings.label.apiKey")), c)
+        result.add(JBLabel(PushkinBundle.message("settings.label.apiKey")), c)
 
         c.gridx = 1
         c.weightx = 1.0
@@ -60,7 +60,7 @@ class CommitAiConfigurable(project: Project) : Configurable {
         c.gridx = 0
         c.gridy++
         c.weightx = 0.0
-        result.add(JBLabel(CommitAiBundle.message("settings.label.model")), c)
+        result.add(JBLabel(PushkinBundle.message("settings.label.model")), c)
 
         c.gridx = 1
         c.weightx = 1.0
@@ -69,7 +69,7 @@ class CommitAiConfigurable(project: Project) : Configurable {
         c.gridx = 0
         c.gridy++
         c.weightx = 0.0
-        result.add(JBLabel(CommitAiBundle.message("settings.label.temperature")), c)
+        result.add(JBLabel(PushkinBundle.message("settings.label.temperature")), c)
 
         c.gridx = 1
         c.weightx = 1.0
@@ -79,7 +79,7 @@ class CommitAiConfigurable(project: Project) : Configurable {
         c.gridy++
         c.anchor = GridBagConstraints.NORTHWEST
         c.weightx = 0.0
-        result.add(JBLabel(CommitAiBundle.message("settings.label.promptTemplate")), c)
+        result.add(JBLabel(PushkinBundle.message("settings.label.promptTemplate")), c)
 
         c.gridx = 1
         c.weightx = 1.0
@@ -93,7 +93,7 @@ class CommitAiConfigurable(project: Project) : Configurable {
         c.weightx = 0.0
         c.weighty = 0.0
         c.fill = GridBagConstraints.HORIZONTAL
-        result.add(JBLabel(CommitAiBundle.message("settings.label.projectPromptTemplate")), c)
+        result.add(JBLabel(PushkinBundle.message("settings.label.projectPromptTemplate")), c)
 
         c.gridx = 1
         c.weightx = 1.0
@@ -105,7 +105,7 @@ class CommitAiConfigurable(project: Project) : Configurable {
         c.gridy++
         c.weighty = 0.0
         c.fill = GridBagConstraints.HORIZONTAL
-        result.add(JBLabel(CommitAiBundle.message("settings.project.promptHint")), c)
+        result.add(JBLabel(PushkinBundle.message("settings.project.promptHint")), c)
 
         panel = result
         reset()
@@ -127,8 +127,8 @@ class CommitAiConfigurable(project: Project) : Configurable {
         val temp = temperatureField.text.toDoubleOrNull()
         if (temp == null || temp !in 0.0..1.0) {
             Messages.showErrorDialog(
-                CommitAiBundle.message("settings.error.temperatureRange"),
-                CommitAiBundle.message("dialog.title"),
+                PushkinBundle.message("settings.error.temperatureRange"),
+                PushkinBundle.message("dialog.title"),
             )
             return
         }

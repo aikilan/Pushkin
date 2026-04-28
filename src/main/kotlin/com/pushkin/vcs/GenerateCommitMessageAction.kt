@@ -1,9 +1,9 @@
-package com.commitai.vcs
+package com.pushkin.vcs
 
-import com.commitai.ai.OpenAiCompatibleClient
-import com.commitai.i18n.CommitAiBundle
-import com.commitai.settings.CommitAiProjectSettings
-import com.commitai.settings.CommitAiSettings
+import com.pushkin.ai.OpenAiCompatibleClient
+import com.pushkin.i18n.PushkinBundle
+import com.pushkin.settings.PushkinProjectSettings
+import com.pushkin.settings.PushkinSettings
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.Presentation
@@ -46,8 +46,8 @@ class GenerateCommitMessageAction : AnAction() {
         if (selectedChanges.isEmpty()) {
             Messages.showInfoMessage(
                 project,
-                CommitAiBundle.message("action.info.selectChange"),
-                CommitAiBundle.message("dialog.title"),
+                PushkinBundle.message("action.info.selectChange"),
+                PushkinBundle.message("dialog.title"),
             )
             return
         }
@@ -57,9 +57,9 @@ class GenerateCommitMessageAction : AnAction() {
         loadingProjects.add(project)
         updatePresentation(e.presentation, isVisible = true, isLoading = true)
         ProgressManager.getInstance().run(
-            object : Task.Backgroundable(project, CommitAiBundle.message("action.task.generating"), false) {
+            object : Task.Backgroundable(project, PushkinBundle.message("action.task.generating"), false) {
                 override fun run(indicator: com.intellij.openapi.progress.ProgressIndicator) {
-                    indicator.text = CommitAiBundle.message("action.progress.callingAi")
+                    indicator.text = PushkinBundle.message("action.progress.callingAi")
                     runCatching {
                         client.generateCommitMessage(contextText, systemPrompt)
                     }.onSuccess { message ->
@@ -69,8 +69,8 @@ class GenerateCommitMessageAction : AnAction() {
                             if (message.isBlank()) {
                                 Messages.showWarningDialog(
                                     project,
-                                    CommitAiBundle.message("action.warning.emptyResult"),
-                                    CommitAiBundle.message("dialog.title"),
+                                    PushkinBundle.message("action.warning.emptyResult"),
+                                    PushkinBundle.message("dialog.title"),
                                 )
                                 return@invokeLaterIfNeeded
                             }
@@ -82,8 +82,8 @@ class GenerateCommitMessageAction : AnAction() {
                             updatePresentation(e.presentation, isVisible = true, isLoading = false)
                             Messages.showErrorDialog(
                                 project,
-                                error.message ?: CommitAiBundle.message("action.error.unknown"),
-                                CommitAiBundle.message("dialog.title"),
+                                error.message ?: PushkinBundle.message("action.error.unknown"),
+                                PushkinBundle.message("dialog.title"),
                             )
                         }
                     }
@@ -101,14 +101,14 @@ class GenerateCommitMessageAction : AnAction() {
 
     // 项目提示词非空时覆盖全局提示词，留空则保持现有全局提示词体验。
     private fun resolveSystemPrompt(project: Project): String {
-        val projectPrompt = CommitAiProjectSettings.getInstance(project).state.promptTemplate.trim()
-        return projectPrompt.ifBlank { CommitAiSettings.getInstance().state.promptTemplate }
+        val projectPrompt = PushkinProjectSettings.getInstance(project).state.promptTemplate.trim()
+        return projectPrompt.ifBlank { PushkinSettings.getInstance().state.promptTemplate }
     }
 
     // 统一刷新提交按钮展示状态，避免 XML 占位符 tooltip 和点击 loading 状态不同步。
     private fun updatePresentation(presentation: Presentation, isVisible: Boolean, isLoading: Boolean) {
-        presentation.text = CommitAiBundle.message("action.generate.text")
-        presentation.description = CommitAiBundle.message("action.generate.description")
+        presentation.text = PushkinBundle.message("action.generate.text")
+        presentation.description = PushkinBundle.message("action.generate.description")
         presentation.isVisible = isVisible
         presentation.isEnabled = isVisible && !isLoading
         presentation.icon = if (isLoading) AnimatedIcon.Default.INSTANCE else defaultIcon
@@ -116,7 +116,7 @@ class GenerateCommitMessageAction : AnAction() {
 
     private fun buildContext(changes: Collection<Change>): String {
         val builder = StringBuilder()
-        builder.appendLine(CommitAiBundle.message("action.context.header"))
+        builder.appendLine(PushkinBundle.message("action.context.header"))
         changes.forEachIndexed { index, change ->
             builder.appendLine("${index + 1}. ${describeChange(change)}")
             val diffSnippet = buildDiffSnippet(change)
@@ -131,11 +131,11 @@ class GenerateCommitMessageAction : AnAction() {
         val before = change.beforeRevision?.file?.path
         val after = change.afterRevision?.file?.path
         return when {
-            before == null && after != null -> CommitAiBundle.message("action.change.added", after)
-            before != null && after == null -> CommitAiBundle.message("action.change.deleted", before)
-            before != null && after != null && before != after -> CommitAiBundle.message("action.change.renamed", before, after)
-            after != null -> CommitAiBundle.message("action.change.modified", after)
-            else -> CommitAiBundle.message("action.change.unknown")
+            before == null && after != null -> PushkinBundle.message("action.change.added", after)
+            before != null && after == null -> PushkinBundle.message("action.change.deleted", before)
+            before != null && after != null && before != after -> PushkinBundle.message("action.change.renamed", before, after)
+            after != null -> PushkinBundle.message("action.change.modified", after)
+            else -> PushkinBundle.message("action.change.unknown")
         }
     }
 
@@ -161,7 +161,7 @@ class GenerateCommitMessageAction : AnAction() {
         return if (rawSnippet.length <= MAX_DIFF_CHARS_PER_FILE) {
             rawSnippet
         } else {
-            rawSnippet.take(MAX_DIFF_CHARS_PER_FILE) + CommitAiBundle.message("action.diff.truncated")
+            rawSnippet.take(MAX_DIFF_CHARS_PER_FILE) + PushkinBundle.message("action.diff.truncated")
         }
     }
 
@@ -171,7 +171,7 @@ class GenerateCommitMessageAction : AnAction() {
         val builder = StringBuilder("--- /dev/null\n+++ new file\n")
         snippetLines.forEach { builder.appendLine("+ $it") }
         if (lines.size > snippetLines.size) {
-            builder.appendLine(CommitAiBundle.message("action.diff.addedOmitted", lines.size - snippetLines.size))
+            builder.appendLine(PushkinBundle.message("action.diff.addedOmitted", lines.size - snippetLines.size))
         }
         return builder.toString().trimEnd()
     }
@@ -182,7 +182,7 @@ class GenerateCommitMessageAction : AnAction() {
         val builder = StringBuilder("--- deleted file\n+++ /dev/null\n")
         snippetLines.forEach { builder.appendLine("- $it") }
         if (lines.size > snippetLines.size) {
-            builder.appendLine(CommitAiBundle.message("action.diff.deletedOmitted", lines.size - snippetLines.size))
+            builder.appendLine(PushkinBundle.message("action.diff.deletedOmitted", lines.size - snippetLines.size))
         }
         return builder.toString().trimEnd()
     }
@@ -221,13 +221,13 @@ class GenerateCommitMessageAction : AnAction() {
         beforeSnippet.forEach { builder.appendLine("- $it") }
         if (beforeChanged.size > beforeSnippet.size) {
             builder.appendLine(
-                CommitAiBundle.message("action.diff.modifiedBeforeOmitted", beforeChanged.size - beforeSnippet.size),
+                PushkinBundle.message("action.diff.modifiedBeforeOmitted", beforeChanged.size - beforeSnippet.size),
             )
         }
         afterSnippet.forEach { builder.appendLine("+ $it") }
         if (afterChanged.size > afterSnippet.size) {
             builder.appendLine(
-                CommitAiBundle.message("action.diff.modifiedAfterOmitted", afterChanged.size - afterSnippet.size),
+                PushkinBundle.message("action.diff.modifiedAfterOmitted", afterChanged.size - afterSnippet.size),
             )
         }
         return builder.toString().trimEnd()
@@ -249,6 +249,6 @@ class GenerateCommitMessageAction : AnAction() {
         if (context.length <= MAX_CONTEXT_CHARS) {
             return context
         }
-        return context.take(MAX_CONTEXT_CHARS) + CommitAiBundle.message("action.context.truncated")
+        return context.take(MAX_CONTEXT_CHARS) + PushkinBundle.message("action.context.truncated")
     }
 }

@@ -1,4 +1,4 @@
-package com.commitai.settings
+package com.pushkin.settings
 
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.Service
@@ -8,8 +8,8 @@ import com.intellij.openapi.components.StoragePathMacros
 import com.intellij.openapi.project.Project
 
 @Service(Service.Level.PROJECT)
-@State(name = "CommitAiProjectSettings", storages = [Storage(StoragePathMacros.WORKSPACE_FILE)])
-class CommitAiProjectSettings : PersistentStateComponent<CommitAiProjectSettings.State> {
+@State(name = "PushkinProjectSettings", storages = [Storage(StoragePathMacros.WORKSPACE_FILE)])
+class PushkinProjectSettings : PersistentStateComponent<PushkinProjectSettings.State> {
     // 当前项目专属提示词写入 workspace 文件，仅对当前用户当前项目生效。
     data class State(
         var promptTemplate: String = "",
@@ -24,8 +24,8 @@ class CommitAiProjectSettings : PersistentStateComponent<CommitAiProjectSettings
     }
 
     companion object {
-        fun getInstance(project: Project): CommitAiProjectSettings {
-            return project.getService(CommitAiProjectSettings::class.java)
+        fun getInstance(project: Project): PushkinProjectSettings {
+            return project.getService(PushkinProjectSettings::class.java)
         }
     }
 }

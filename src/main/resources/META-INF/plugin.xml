@@ -1,8 +1,8 @@
 <idea-plugin>
-    <id>com.commitai.plugin</id>
-    <name>Commit AI (OpenAI Compatible)</name>
-    <vendor email="aikilan.ft@gmail.com">Commit AI</vendor>
-    <resource-bundle>messages.CommitAiBundle</resource-bundle>
+    <id>com.pushkin.plugin</id>
+    <name>Pushkin (OpenAI Compatible)</name>
+    <vendor email="aikilan.ft@gmail.com">Pushkin</vendor>
+    <resource-bundle>messages.PushkinBundle</resource-bundle>
 
     <description>
         <![CDATA[
@@ -15,18 +15,18 @@
     <depends>Git4Idea</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.commitai.settings.CommitAiSettings"/>
-        <projectService serviceImplementation="com.commitai.settings.CommitAiProjectSettings"/>
+        <applicationService serviceImplementation="com.pushkin.settings.PushkinSettings"/>
+        <projectService serviceImplementation="com.pushkin.settings.PushkinProjectSettings"/>
         <projectConfigurable
-                id="com.commitai.settings"
+                id="com.pushkin.settings"
                 key="settings.display.name"
-                instance="com.commitai.settings.CommitAiConfigurable"/>
+                instance="com.pushkin.settings.PushkinConfigurable"/>
     </extensions>
 
     <actions>
-        <action id="CommitAi.GenerateCommitMessageAction"
-                class="com.commitai.vcs.GenerateCommitMessageAction"
-                text="Commit AI"
+        <action id="Pushkin.GenerateCommitMessageAction"
+                class="com.pushkin.vcs.GenerateCommitMessageAction"
+                text="Pushkin"
                 description="Generate commit message based on selected changes"
                 icon="/icons/icon.svg">
             <add-to-group group-id="Vcs.MessageActionGroup" anchor="last"/>

@@ -1,6 +1,6 @@
-package com.commitai.settings
+package com.pushkin.settings
 
-import com.commitai.i18n.CommitAiBundle
+import com.pushkin.i18n.PushkinBundle
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.Service
@@ -8,8 +8,8 @@ import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 
 @Service(Service.Level.APP)
-@State(name = "CommitAiSettings", storages = [Storage("commit-ai.xml")])
-class CommitAiSettings : PersistentStateComponent<CommitAiSettings.State> {
+@State(name = "PushkinSettings", storages = [Storage("pushkin.xml")])
+class PushkinSettings : PersistentStateComponent<PushkinSettings.State> {
     data class State(
         var baseUrl: String = "https://api.openai.com",
         var apiKey: String = "",
@@ -28,11 +28,11 @@ class CommitAiSettings : PersistentStateComponent<CommitAiSettings.State> {
 
     companion object {
         private fun defaultPromptTemplate(): String {
-            return CommitAiBundle.message("settings.defaultPromptTemplate")
+            return PushkinBundle.message("settings.defaultPromptTemplate")
         }
 
-        fun getInstance(): CommitAiSettings {
-            return ApplicationManager.getApplication().getService(CommitAiSettings::class.java)
+        fun getInstance(): PushkinSettings {
+            return ApplicationManager.getApplication().getService(PushkinSettings::class.java)
         }
     }
 }

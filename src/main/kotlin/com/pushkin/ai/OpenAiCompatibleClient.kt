@@ -1,7 +1,7 @@
-package com.commitai.ai
+package com.pushkin.ai
 
-import com.commitai.i18n.CommitAiBundle
-import com.commitai.settings.CommitAiSettings
+import com.pushkin.i18n.PushkinBundle
+import com.pushkin.settings.PushkinSettings
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -13,7 +13,7 @@ import java.net.http.HttpResponse
 import java.time.Duration
 
 class OpenAiCompatibleClient(
-    private val settings: CommitAiSettings = CommitAiSettings.getInstance(),
+    private val settings: PushkinSettings = PushkinSettings.getInstance(),
 ) {
     private val httpClient: HttpClient = HttpClient.newBuilder()
         .connectTimeout(Duration.ofSeconds(15))
@@ -45,24 +45,24 @@ class OpenAiCompatibleClient(
 
         val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
         if (response.statusCode() !in 200..299) {
-            error(CommitAiBundle.message("client.error.requestFailed", response.statusCode(), response.body()))
+            error(PushkinBundle.message("client.error.requestFailed", response.statusCode(), response.body()))
         }
 
         val parsed = json.decodeFromString(ChatResponse.serializer(), response.body())
         val content = parsed.choices.firstOrNull()?.message?.content?.trim().orEmpty()
         if (content.isBlank()) {
-            error(CommitAiBundle.message("client.error.emptyResponse"))
+            error(PushkinBundle.message("client.error.emptyResponse"))
         }
         return content
     }
 
-    private fun validateState(state: CommitAiSettings.State) {
-        require(state.baseUrl.isNotBlank()) { CommitAiBundle.message("client.validate.baseUrl.blank") }
+    private fun validateState(state: PushkinSettings.State) {
+        require(state.baseUrl.isNotBlank()) { PushkinBundle.message("client.validate.baseUrl.blank") }
         require(state.baseUrl.startsWith("http://") || state.baseUrl.startsWith("https://")) {
-            CommitAiBundle.message("client.validate.baseUrl.invalid")
+            PushkinBundle.message("client.validate.baseUrl.invalid")
         }
-        require(state.apiKey.isNotBlank()) { CommitAiBundle.message("client.validate.apiKey.blank") }
-        require(state.model.isNotBlank()) { CommitAiBundle.message("client.validate.model.blank") }
+        require(state.apiKey.isNotBlank()) { PushkinBundle.message("client.validate.apiKey.blank") }
+        require(state.model.isNotBlank()) { PushkinBundle.message("client.validate.model.blank") }
     }
 
     @Serializable

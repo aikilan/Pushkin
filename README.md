@@ -1,68 +1,159 @@
-# Commit AI (OpenAI Compatible)
+# Pushkin (OpenAI Compatible)
 
-这是一个为 JetBrains IDE 系列开发的插件，旨在利用 AI 技术自动生成 Git 提交消息。
+Pushkin is a JetBrains IDE plugin that generates Git commit messages with an OpenAI-compatible AI service.
 
-### 功能介绍
+## Features
 
-- **AI 自动生成**：在提交窗口（Commit Window）中，点击图标即可根据当前选中的更改自动生成提交消息。
-- **OpenAI 兼容**：支持配置任何兼容 OpenAI 协议的 API 端点（如 OpenAI 官方、DeepSeek、自建服务等）。
-- **交互友好**：
-    - 生成过程中提供 Loading 动画。
-    - 生成完成后自动填充到提交消息输入框。
-- **配置灵活**：可在 IDE 设置中配置 API Key、Base URL 及模型名称。
-- **国际化**：支持中英文界面。
+- **AI-generated commit messages**: Generate a commit message from the selected changes in the Commit window.
+- **OpenAI-compatible API support**: Configure any OpenAI-compatible endpoint, including OpenAI, DeepSeek, or self-hosted services.
+- **Prompt configuration**:
+  - Use a global prompt template by default.
+  - Configure a project-specific prompt template for the current project.
+  - When the project prompt is empty, Pushkin falls back to the global prompt.
+- **Friendly interaction**:
+  - Shows a loading animation while generating.
+  - Fills the generated result into the commit message field automatically.
+- **Internationalized UI**: Supports English and Chinese.
 
-### 构建与运行
+## Build and Run
 
-该项目使用 Gradle 构建系统。
+This project uses Gradle.
 
-#### 环境要求
+### Requirements
 
-- **JDK 21**: 插件使用 JDK 21 进行编译。请确保已安装并配置了 `JAVA_HOME` 环境变量。
-  - 检查命令：`java -version`
-  - 如果未安装，推荐从 [Adoptium (Temurin)](https://adoptium.net/) 或使用 `brew install openjdk@21` (macOS) 安装。
+- **JDK 21**: The plugin is compiled with JDK 21. Make sure `JAVA_HOME` is configured.
+  - Check with:
+    ```bash
+    java -version
+    ```
+  - If JDK 21 is not installed, use [Adoptium Temurin](https://adoptium.net/) or install it with Homebrew on macOS:
+    ```bash
+    brew install openjdk@21
+    ```
 
-#### 构建命令
+### Commands
 
-- **一键构建（推荐）**：
-  我们提供了一个脚本来自动处理环境检查和构建：
+- **Build the plugin package**:
   ```bash
   ./build.sh
   ```
-  该脚本会自动尝试在 macOS 上寻找 JDK 21，并执行清理与打包。
 
-- **手动生成插件安装包**：
+- **Build manually**:
   ```bash
   JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH" ./gradlew build
   ```
-  构建完成后，生成的安装包（ZIP 文件）位于 `build/distributions/` 目录下。
+
+- **Run in a development IDE sandbox**:
+  ```bash
+  ./gradlew runIde
+  ```
+
+- **Clean build outputs**:
+  ```bash
+  ./gradlew clean
+  ```
+
+The plugin ZIP package is generated under `build/distributions/`.
+
+## FAQ
+
+### Unable to locate a Java Runtime
+
+This means Gradle cannot find a valid Java runtime.
+
+On macOS or Linux:
+
+1. Install JDK 21.
+2. Configure `JAVA_HOME`, for example:
+   ```bash
+   export JAVA_HOME=/path/to/your/jdk-21
+   export PATH=$JAVA_HOME/bin:$PATH
+   ```
+3. Reopen the terminal and run the build again.
+
+On Windows:
+
+1. Install JDK 21.
+2. Set `JAVA_HOME` to the JDK installation directory.
+3. Add `%JAVA_HOME%\bin` to `Path`.
+
+---
+
+# Pushkin (OpenAI 兼容)
+
+Pushkin 是一个 JetBrains IDE 插件，用于通过 OpenAI 兼容的 AI 服务自动生成 Git 提交消息。
+
+## 功能介绍
+
+- **AI 自动生成提交消息**：在提交窗口中，根据当前选中的变更生成提交消息。
+- **OpenAI 兼容接口**：支持配置 OpenAI、DeepSeek、自建服务等 OpenAI 兼容端点。
+- **提示词配置**：
+  - 默认使用全局提示词模板。
+  - 可为当前项目配置专属提示词模板。
+  - 当前项目提示词为空时，自动回退到全局提示词。
+- **交互友好**：
+  - 生成过程中展示 Loading 动画。
+  - 生成完成后自动填充到提交消息输入框。
+- **国际化界面**：支持英文和中文。
+
+## 构建与运行
+
+该项目使用 Gradle 构建。
+
+### 环境要求
+
+- **JDK 21**：插件使用 JDK 21 编译，请确保已配置 `JAVA_HOME`。
+  - 检查命令：
+    ```bash
+    java -version
+    ```
+  - 如果未安装，可使用 [Adoptium Temurin](https://adoptium.net/) 或在 macOS 上通过 Homebrew 安装：
+    ```bash
+    brew install openjdk@21
+    ```
+
+### 常用命令
+
+- **构建插件安装包**：
+  ```bash
+  ./build.sh
+  ```
+
+- **手动构建**：
+  ```bash
+  JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH" ./gradlew build
+  ```
 
 - **在开发沙盒中运行 IDE**：
   ```bash
   ./gradlew runIde
   ```
-  此命令会启动一个预装了该插件的 IDE 实例，方便进行调试和功能验证。
 
 - **清理构建产物**：
   ```bash
   ./gradlew clean
   ```
 
-### 常见问题 (FAQ)
+插件 ZIP 安装包会生成在 `build/distributions/` 目录下。
 
-#### 1. 报错 "Unable to locate a Java Runtime"
-如果在执行 `./gradlew` 命令时遇到此报错，说明系统找不到 Java 环境。
-**解决方法：**
-- **macOS/Linux**:
-  1. 确认已安装 JDK 21。
-  2. 在终端执行 `export JAVA_HOME=$(/usr/libexec/java_home -v 21)` (仅 macOS)。
-  3. 或者在 `~/.zshrc` 或 `~/.bash_profile` 中添加：
-     ```bash
-     export JAVA_HOME=/path/to/your/jdk-21
-     export PATH=$JAVA_HOME/bin:$PATH
-     ```
-  4. 重新打开终端。
-- **Windows**:
-  1. 确认已安装 JDK 21。
-  2. 在“系统环境变量”中设置 `JAVA_HOME` 指向 JDK 安装目录。
-  3. 将 `%JAVA_HOME%\bin` 添加到 `Path` 变量中。
+## 常见问题
+
+### Unable to locate a Java Runtime
+
+这表示 Gradle 找不到可用的 Java 运行环境。
+
+macOS 或 Linux：
+
+1. 安装 JDK 21。
+2. 配置 `JAVA_HOME`，例如：
+   ```bash
+   export JAVA_HOME=/path/to/your/jdk-21
+   export PATH=$JAVA_HOME/bin:$PATH
+   ```
+3. 重新打开终端后再次构建。
+
+Windows：
+
+1. 安装 JDK 21。
+2. 将 `JAVA_HOME` 设置为 JDK 安装目录。
+3. 将 `%JAVA_HOME%\bin` 添加到 `Path`。
