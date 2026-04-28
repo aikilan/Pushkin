@@ -4,17 +4,24 @@ import com.commitai.ai.OpenAiCompatibleClient
 import com.commitai.i18n.CommitAiBundle
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.Presentation
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.vcs.CheckinProjectPanel
 import com.intellij.openapi.vcs.changes.Change
 import com.intellij.openapi.vcs.changes.ContentRevision
 import com.intellij.openapi.vcs.ui.Refreshable
+import com.intellij.ui.AnimatedIcon
 import com.intellij.util.ui.UIUtil
+import java.util.Collections
 
 class GenerateCommitMessageAction : AnAction() {
     private val client = OpenAiCompatibleClient()
+    private val defaultIcon = IconLoader.getIcon("/icons/icon.svg", GenerateCommitMessageAction::class.java)
+    private val loadingProjects = Collections.synchronizedSet(mutableSetOf<Project>())
 
     companion object {
         private const val MAX_CONTEXT_CHARS = 12_000
@@ -23,8 +30,10 @@ class GenerateCommitMessageAction : AnAction() {
     }
 
     override fun update(e: AnActionEvent) {
+        val project = e.project
         val panel = e.getData(Refreshable.PANEL_KEY) as? CheckinProjectPanel
-        e.presentation.isEnabledAndVisible = panel != null
+        val isLoading = project != null && loadingProjects.contains(project)
+        updatePresentation(e.presentation, panel != null, isLoading)
     }
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -42,6 +51,8 @@ class GenerateCommitMessageAction : AnAction() {
         }
 
         val contextText = buildContext(selectedChanges)
+        loadingProjects.add(project)
+        updatePresentation(e.presentation, isVisible = true, isLoading = true)
         ProgressManager.getInstance().run(
             object : Task.Backgroundable(project, CommitAiBundle.message("action.task.generating"), false) {
                 override fun run(indicator: com.intellij.openapi.progress.ProgressIndicator) {
@@ -50,6 +61,8 @@ class GenerateCommitMessageAction : AnAction() {
                         client.generateCommitMessage(contextText)
                     }.onSuccess { message ->
                         UIUtil.invokeLaterIfNeeded {
+                            loadingProjects.remove(project)
+                            updatePresentation(e.presentation, isVisible = true, isLoading = false)
                             if (message.isBlank()) {
                                 Messages.showWarningDialog(
                                     project,
@@ -62,6 +75,8 @@ class GenerateCommitMessageAction : AnAction() {
                         }
                     }.onFailure { error ->
                         UIUtil.invokeLaterIfNeeded {
+                            loadingProjects.remove(project)
+                            updatePresentation(e.presentation, isVisible = true, isLoading = false)
                             Messages.showErrorDialog(
                                 project,
                                 error.message ?: CommitAiBundle.message("action.error.unknown"),
@@ -70,8 +85,24 @@ class GenerateCommitMessageAction : AnAction() {
                         }
                     }
                 }
+
+                override fun onCancel() {
+                    loadingProjects.remove(project)
+                    UIUtil.invokeLaterIfNeeded {
+                        updatePresentation(e.presentation, isVisible = true, isLoading = false)
+                    }
+                }
             },
         )
+    }
+
+    // 统一刷新提交按钮展示状态，避免 XML 占位符 tooltip 和点击 loading 状态不同步。
+    private fun updatePresentation(presentation: Presentation, isVisible: Boolean, isLoading: Boolean) {
+        presentation.text = CommitAiBundle.message("action.generate.text")
+        presentation.description = CommitAiBundle.message("action.generate.description")
+        presentation.isVisible = isVisible
+        presentation.isEnabled = isVisible && !isLoading
+        presentation.icon = if (isLoading) AnimatedIcon.Default.INSTANCE else defaultIcon
     }
 
     private fun buildContext(changes: Collection<Change>): String {
