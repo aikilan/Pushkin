@@ -1,6 +1,6 @@
 # Pushkin (OpenAI Compatible)
 
-Pushkin is a JetBrains IDE plugin that generates Git commit messages with an OpenAI-compatible AI service.
+Pushkin generates Git commit messages with an OpenAI-compatible AI service. This repository includes a JetBrains IDE plugin and an OpenIDEA plugin.
 
 ## Features
 
@@ -15,7 +15,11 @@ Pushkin is a JetBrains IDE plugin that generates Git commit messages with an Ope
   - Fills the generated result into the commit message field automatically.
 - **Internationalized UI**: Supports English and Chinese.
 
-## Build and Run
+## OpenIDEA
+
+The OpenIDEA plugin requires an IDE build with the `ai-completions` plugin permission and commit message generator support. See [OpenIDEA build and installation](openidea/README.md).
+
+## Build and Run (JetBrains)
 
 This project uses Gradle.
 
@@ -81,7 +85,7 @@ On Windows:
 
 # Pushkin (OpenAI 兼容)
 
-Pushkin 是一个 JetBrains IDE 插件，用于通过 OpenAI 兼容的 AI 服务自动生成 Git 提交消息。
+Pushkin 使用 OpenAI 兼容的 AI 服务自动生成 Git 提交消息。本仓库包含 JetBrains IDE 插件和 OpenIDEA 插件。
 
 ## 功能介绍
 
@@ -96,7 +100,11 @@ Pushkin 是一个 JetBrains IDE 插件，用于通过 OpenAI 兼容的 AI 服务
   - 生成完成后自动填充到提交消息输入框。
 - **国际化界面**：支持英文和中文。
 
-## 构建与运行
+## OpenIDEA
+
+OpenIDEA 插件需要支持 `ai-completions` 插件权限和提交消息生成器的 IDE 版本。构建及安装步骤见 [OpenIDEA 插件说明](openidea/README.md)。
+
+## 构建与运行（JetBrains）
 
 该项目使用 Gradle 构建。
 
