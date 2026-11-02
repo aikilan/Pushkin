@@ -1,0 +1,8 @@
+id = "pushkin"
+name = "Pushkin Commit AI"
+version = "0.1.0"
+description = "Generate commit messages from selected changes with an OpenAI-compatible service."
+authors = ["Pushkin"]
+openidea-api = "0.1"
+wasm = "dist/plugin.wasm"
+permissions = ["ai-completions"]
